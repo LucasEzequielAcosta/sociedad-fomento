@@ -134,24 +134,53 @@ The accounting module provides a basic view of:
 
 ```text
 /
-├── frontend/
 ├── backend/
-├── database/
-├── docs/
+│   ├── SociedadFomento.slnx
+│   └── src/
+│       ├── SociedadFomento.Api/
+│       ├── SociedadFomento.Application/
+│       ├── SociedadFomento.Domain/
+│       └── SociedadFomento.Infrastructure/
+├── frontend/
+│   └── src/app/
+│       ├── core/
+│       ├── shared/
+│       └── features/
 ├── AGENTS.md
-└── README.md
+├── README.md
+└── SPEC.md
 ```
 
 ## Development
 
-Detailed development rules and business constraints are documented in `AGENTS.md`.
+Detailed development rules and business constraints are documented in `AGENTS.md` and `SPEC.md`.
 
-The project should be developed incrementally.
+### Prerequisites
 
-Each feature should be implemented, tested and reviewed before moving to the next feature.
+* .NET SDK 10.0.300 or a compatible .NET 10 feature band.
+* Node.js 22.22.3, 24.15.0 or a later supported version.
+* npm 11.6.2 or a compatible version.
+
+### Backend
+
+```powershell
+dotnet restore backend/SociedadFomento.slnx
+dotnet build backend/SociedadFomento.slnx --no-restore
+dotnet run --project backend/src/SociedadFomento.Api
+```
+
+### Frontend
+
+```powershell
+cd frontend
+npm ci
+npm start
+```
+
+Use `npm run build` for a production build and `npm test -- --watch=false` for a single test run.
+
+The project should be developed incrementally. Each feature should be implemented, tested and reviewed before moving to the next feature.
 
 ## Current Status
 
-The project is in the initial development stage.
-
-The repository is being prepared before implementation of the first functional modules.
+The initial .NET and Angular project structure is ready. Business functionality, authentication and persistence have not been implemented yet.
