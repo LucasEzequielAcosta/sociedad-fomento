@@ -83,7 +83,9 @@ El DNI identifica de forma única al socio.
 
 ## 3.1 Alta
 
-Al registrar un socio se debe indicar la fecha de alta.
+Al registrar un socio, la fecha de alta se obtiene de la fecha actual del sistema en la zona horaria de negocio `America/Argentina/Buenos_Aires`.
+
+El DNI se normaliza eliminando puntos, guiones y espacios antes de validar su unicidad y almacenarlo.
 
 El socio comienza a tener obligación de pago desde el mes correspondiente a su fecha de alta.
 
@@ -95,22 +97,41 @@ Alta: 20/09/2026
 
 La cuota de septiembre se genera normalmente por el importe completo.
 
+El alta genera únicamente la obligación del mes actual y no genera cuotas futuras.
+
+Si no existe un valor de cuota vigente para el mes de alta, la operación completa se rechaza: no se crea el socio, su período de actividad ni una obligación incompleta.
+
 ## 3.2 Baja
 
 Al pasar un socio a estado `Inactivo`:
 
+* La baja utiliza la fecha actual del sistema en `America/Argentina/Buenos_Aires`.
+* En el MVP no se permiten bajas retroactivas.
 * No se eliminan sus datos.
 * No se elimina su historial.
-* No se eliminan sus cuotas.
+* No se eliminan, anulan ni modifican sus cuotas ya generadas.
+* La cuota del mes de baja continúa siendo exigible por el importe completo.
 * No se eliminan sus pagos.
 * No se eliminan sus movimientos contables relacionados.
-* Deja de generar nuevas cuotas.
+* Deja de generar nuevas cuotas para períodos posteriores al mes de baja.
 
 ## 3.3 Reactivación
 
 Un socio inactivo puede volver a estar activo.
 
 La reactivación se considera una nueva alta a efectos de generación de cuotas.
+
+La cuota del mes de reactivación se genera por el importe completo, independientemente del día de reactivación.
+
+La reactivación debe ocurrir en una fecha posterior a la última baja; no se permite reactivar el mismo día para evitar períodos superpuestos.
+
+Si no existe un valor de cuota vigente para el mes de reactivación, la operación completa se rechaza y no se modifica el socio, sus períodos ni sus obligaciones.
+
+Si ya existe una obligación para el socio y el período de reactivación, no debe generarse una cuota duplicada ni modificarse su período de origen, tarifa o importe.
+
+Si no existe, se crea una única obligación asociada al nuevo período de actividad.
+
+La reactivación no genera cuotas futuras.
 
 Las cuotas correspondientes al período anterior permanecen en el historial y no se eliminan.
 
@@ -204,6 +225,10 @@ Una vez generada una cuota, su importe queda establecido y **no debe modificarse
 
 Modificar el valor de cuota no debe modificar cuotas históricas.
 
+Una vez que un valor de cuota fue utilizado para generar al menos una obligación, no puede modificarse ni eliminarse.
+
+Para aplicar otro importe debe crearse una nueva vigencia.
+
 ---
 
 # 6. Pagos
@@ -264,6 +289,10 @@ En septiembre, el socio puede pagar:
 El administrador selecciona manualmente esas cuotas.
 
 Una cuota puede quedar `Pagada` aunque su período todavía no haya comenzado.
+
+Si una obligación futura ya fue generada y posteriormente el socio es dado de baja, la obligación se conserva.
+
+Si el pago adelantado que la cubría se anula, la obligación queda impaga y será exigible cuando llegue su período, aunque el socio continúe inactivo.
 
 ## 7.2 Pagos parciales
 
@@ -397,7 +426,9 @@ El administrador no debe registrar nuevamente ese ingreso de forma manual.
 
 El ingreso debe estar relacionado con el pago que lo originó.
 
-Si el pago se anula, el ingreso correspondiente debe anularse/revertirse automáticamente.
+La fecha del ingreso contable debe ser exactamente igual a la fecha del pago que lo originó.
+
+Si el pago se anula, el ingreso correspondiente debe anularse automáticamente, conservando su historial y excluyéndolo de los totales activos.
 
 ## 10.2 Otros ingresos
 
@@ -415,6 +446,12 @@ Un ingreso manual debe contener como mínimo:
 * Concepto.
 * Importe.
 
+Los ingresos manuales pueden crearse y anularse, pero no editarse después de su creación.
+
+Para corregir un ingreso manual se debe anular el movimiento original y crear uno nuevo.
+
+La anulación conserva el historial y excluye el ingreso de los totales activos.
+
 ## 10.3 Egresos
 
 Los egresos se registran manualmente.
@@ -424,6 +461,12 @@ Cada egreso contiene:
 * Fecha.
 * Concepto.
 * Importe.
+
+Los egresos pueden crearse y anularse, pero no editarse después de su creación.
+
+Para corregir un egreso se debe anular el movimiento original y crear uno nuevo.
+
+La anulación conserva el historial y excluye el egreso de los totales activos.
 
 No se requieren categorías de gastos en el MVP.
 
@@ -521,12 +564,17 @@ No se requiere un sistema avanzado de generación de reportes.
 
 ## Administradores
 
-Los administradores deben autenticarse mediante:
+Los administradores deben autenticarse exclusivamente mediante email y contraseña.
 
-* Usuario/email.
-* Contraseña.
+Las contraseñas deben almacenarse utilizando un hash seguro, nunca en texto plano.
 
-Las contraseñas deben almacenarse de forma segura, nunca en texto plano.
+La sesión administrativa utiliza una cookie cifrada, `HttpOnly`, `Secure` y `SameSite=Strict`, con rol `Admin` validado por el backend.
+
+El login, logout y las operaciones administrativas que modifican datos requieren protección antiforgery.
+
+El primer administrador puede crearse de forma idempotente mediante `AdminBootstrap__Email` y `AdminBootstrap__Password`, después de aplicar manualmente las migraciones.
+
+En este milestone no existe cambio, recuperación ni restablecimiento de contraseña.
 
 ## Socios
 
@@ -542,25 +590,31 @@ El sistema debe impedir que un socio acceda a información perteneciente a otro 
 2. Todos los socios tienen el mismo valor de cuota para un período determinado.
 3. El valor de cuota puede cambiar a partir de un mes determinado.
 4. Cambiar el valor de cuota no modifica cuotas históricas.
-5. Las cuotas comienzan a ser exigibles el día 1 del mes.
-6. Una cuota impaga pasa a vencida el día 1 del mes siguiente.
-7. No existen pagos parciales.
-8. Un pago puede imputarse a varias cuotas.
-9. Se pueden pagar cuotas futuras.
-10. El administrador selecciona manualmente las cuotas que cancela un pago.
-11. Las cuotas pagadas no se vuelven a cobrar.
-12. Anular un pago libera nuevamente las cuotas que había cancelado.
-13. Anular un pago también revierte el ingreso contable correspondiente.
-14. Los socios inactivos no generan nuevas cuotas.
-15. La información histórica de socios inactivos se conserva.
-16. Reactivar un socio genera nuevas obligaciones desde el mes de reactivación.
-17. Las cuotas futuras no forman parte de la deuda.
-18. Los pagos de cuotas generan automáticamente ingresos contables.
-19. Los otros ingresos se pueden registrar manualmente.
-20. Los egresos se registran manualmente.
-21. No se requieren comprobantes en el MVP.
-22. No se requiere integración bancaria.
-23. El sistema debe priorizar simplicidad y facilidad de mantenimiento.
+5. Una tarifa utilizada no se modifica ni elimina; un cambio requiere una nueva vigencia.
+6. Las cuotas comienzan a ser exigibles el día 1 del mes.
+7. Una cuota impaga pasa a vencida el día 1 del mes siguiente.
+8. No existen pagos parciales.
+9. Un pago puede imputarse a varias cuotas.
+10. Se pueden pagar cuotas futuras.
+11. El administrador selecciona manualmente las cuotas que cancela un pago.
+12. Las cuotas pagadas no se vuelven a cobrar.
+13. Anular un pago libera nuevamente las cuotas que había cancelado.
+14. Anular un pago también anula el ingreso contable correspondiente.
+15. La fecha del ingreso automático coincide con la fecha del pago.
+16. Los socios inactivos no generan nuevas cuotas.
+17. La baja usa la fecha actual y no puede ser retroactiva en el MVP.
+18. La baja no elimina, anula ni modifica obligaciones ya generadas.
+19. La información histórica de socios inactivos se conserva.
+20. Reactivar un socio genera la cuota completa desde el mes de reactivación sin duplicar una obligación existente.
+21. Las cuotas futuras no forman parte de la deuda hasta que comienza su período.
+22. Una obligación futura ya generada se conserva aunque el socio sea dado de baja.
+23. Los pagos de cuotas generan automáticamente ingresos contables.
+24. Los otros ingresos se pueden crear y anular, pero no editar.
+25. Los egresos se pueden crear y anular, pero no editar.
+26. Los movimientos contables anulados conservan su historial y se excluyen de los totales activos.
+27. No se requieren comprobantes en el MVP.
+28. No se requiere integración bancaria.
+29. El sistema debe priorizar simplicidad y facilidad de mantenimiento.
 
 ---
 

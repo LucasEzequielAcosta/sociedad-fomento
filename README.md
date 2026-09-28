@@ -158,6 +158,7 @@ Detailed development rules and business constraints are documented in `AGENTS.md
 ### Prerequisites
 
 * .NET SDK 10.0.300 or a compatible .NET 10 feature band.
+* SQL Server LocalDB for the default Windows development connection.
 * Node.js 22.22.3, 24.15.0 or a later supported version.
 * npm 11.6.2 or a compatible version.
 
@@ -166,7 +167,19 @@ Detailed development rules and business constraints are documented in `AGENTS.md
 ```powershell
 dotnet restore backend/SociedadFomento.slnx
 dotnet build backend/SociedadFomento.slnx --no-restore
+dotnet test backend/SociedadFomento.slnx --no-build
 dotnet run --project backend/src/SociedadFomento.Api
+```
+
+The default connection uses `(localdb)\MSSQLLocalDB` and contains no credentials. Override it with the `ConnectionStrings__DefaultConnection` environment variable when using another SQL Server instance.
+
+After applying migrations manually, the first administrator can be bootstrapped by setting both `AdminBootstrap__Email` and `AdminBootstrap__Password`. If both are absent, startup continues without creating an administrator. Never store their values in repository files. Angular development must proxy API requests through the same origin so secure cookies and the `X-XSRF-TOKEN` antiforgery header work without permissive CORS. Login is limited to five attempts per minute per client IP.
+
+To manage migrations, install the matching stable EF Core tool and use Infrastructure as the migrations project:
+
+```powershell
+dotnet tool install --global dotnet-ef --version 10.0.12
+dotnet ef database update --project backend/src/SociedadFomento.Infrastructure --startup-project backend/src/SociedadFomento.Infrastructure
 ```
 
 ### Frontend
@@ -183,4 +196,4 @@ The project should be developed incrementally. Each feature should be implemente
 
 ## Current Status
 
-The initial .NET and Angular project structure is ready. Business functionality, authentication and persistence have not been implemented yet.
+The initial structure, SQL Server persistence model, administrative Members API and administrator authentication are ready. User interfaces and the remaining business modules have not been implemented yet.

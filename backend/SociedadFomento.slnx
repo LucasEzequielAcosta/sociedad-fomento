@@ -5,4 +5,10 @@
     <Project Path="src/SociedadFomento.Domain/SociedadFomento.Domain.csproj" />
     <Project Path="src/SociedadFomento.Infrastructure/SociedadFomento.Infrastructure.csproj" />
   </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/SociedadFomento.Api.Tests/SociedadFomento.Api.Tests.csproj" />
+    <Project Path="tests/SociedadFomento.Application.Tests/SociedadFomento.Application.Tests.csproj" />
+    <Project Path="tests/SociedadFomento.Domain.Tests/SociedadFomento.Domain.Tests.csproj" />
+    <Project Path="tests/SociedadFomento.Infrastructure.Tests/SociedadFomento.Infrastructure.Tests.csproj" />
+  </Folder>
 </Solution>
