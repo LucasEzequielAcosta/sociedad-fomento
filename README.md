@@ -196,4 +196,19 @@ The project should be developed incrementally. Each feature should be implemente
 
 ## Current Status
 
-The initial structure, SQL Server persistence model, administrative Members API and administrator authentication are ready. User interfaces and the remaining business modules have not been implemented yet.
+Implemented backend modules:
+
+1. Project structure, SQL Server persistence model and migrations.
+2. Administrator authentication and authorization.
+3. Member management (create, search, update, deactivate, reactivate).
+4. Fee-rate management (create with effective month, amount snapshot integrity).
+5. Monthly fee-obligation generation for active members (idempotent, respects inactive periods).
+6. Payment registration and allocation to complete obligations (cash, transfer, direct debit) with automatic income accounting.
+7. Member account statement with debt calculation (paid, pending, overdue; future obligations excluded from debt).
+
+Pending work:
+
+- Other income and expenses (manual accounting entries).
+- Member portal (DNI-only access to own statement).
+- Dashboard / administrative summaries.
+- Filters, exports and user interfaces.

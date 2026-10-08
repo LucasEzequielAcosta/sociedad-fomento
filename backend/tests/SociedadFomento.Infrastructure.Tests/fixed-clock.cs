@@ -4,13 +4,16 @@ namespace SociedadFomento.Infrastructure.Tests;
 
 internal sealed class FixedClock : IClock
 {
+    private DateTime utcNow;
+
     internal FixedClock(DateTime utcNow)
     {
-        UtcNow = utcNow;
+        this.utcNow = utcNow;
     }
 
-    public DateTime UtcNow { get; private set; }
-    public DateOnly Today => BusinessTimeZone.GetDate(UtcNow);
+    public DateTime UtcNow => utcNow;
 
-    internal void SetUtcNow(DateTime utcNow) => UtcNow = utcNow;
+    public DateOnly Today => BusinessTimeZone.GetDate(utcNow);
+
+    internal void SetUtcNow(DateTime value) => utcNow = value;
 }
