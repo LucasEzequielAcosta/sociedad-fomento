@@ -26,7 +26,7 @@ public sealed class AccountingEntryService
     {
         if (!Enum.IsDefined(model.Type))
         {
-            throw new RequestValidationException("INVALID_ACCOUNTING_ENTRY_TYPE", "The entry type must be income or expense.");
+            throw new RequestValidationException("INVALID_ACCOUNTING_ENTRY_TYPE", "El tipo de movimiento debe ser ingreso o egreso.");
         }
 
         AccountingEntry entry;
@@ -52,12 +52,12 @@ public sealed class AccountingEntryService
     public async Task CancelAsync(long id, DateTime cancelledAtUtc, CancellationToken cancellationToken = default)
     {
         AccountingEntry entry = await context.FindByIdAsync(id, cancellationToken)
-            ?? throw new ResourceNotFoundException("ACCOUNTING_ENTRY_NOT_FOUND", "Accounting entry not found.");
+            ?? throw new ResourceNotFoundException("ACCOUNTING_ENTRY_NOT_FOUND", "No se encontró el movimiento contable.");
 
         if (entry.Source != AccountingEntrySource.Manual)
         {
             throw new BusinessRuleException("ACCOUNTING_ENTRY_NOT_MANUAL",
-                "Automatic entries can only be cancelled by cancelling the originating payment.");
+                "Los movimientos automáticos solo pueden anularse anulando el pago que los originó.");
         }
 
         try
@@ -76,7 +76,7 @@ public sealed class AccountingEntryService
     public async Task<AccountingEntryDto> GetByIdAsync(long id, CancellationToken cancellationToken = default)
     {
         AccountingEntryDto? entry = await context.GetByIdAsync(id, cancellationToken);
-        return entry ?? throw new ResourceNotFoundException("ACCOUNTING_ENTRY_NOT_FOUND", "Accounting entry not found.");
+        return entry ?? throw new ResourceNotFoundException("ACCOUNTING_ENTRY_NOT_FOUND", "No se encontró el movimiento contable.");
     }
 
     /// <summary>Returns accounting entries matching the supplied filters.</summary>
@@ -109,7 +109,7 @@ public sealed class AccountingEntryService
             null or AccountingSummaryPeriod.CurrentMonth => MonthRange(today),
             AccountingSummaryPeriod.PreviousMonth => MonthRange(today.AddMonths(-1)),
             AccountingSummaryPeriod.Year => (new DateOnly(today.Year, 1, 1), new DateOnly(today.Year, 12, 31)),
-            _ => throw new RequestValidationException("INVALID_ACCOUNTING_PERIOD", "The requested accounting period is not supported."),
+            _ => throw new RequestValidationException("INVALID_ACCOUNTING_PERIOD", "El período contable solicitado no es válido."),
         };
     }
 
@@ -126,7 +126,7 @@ public sealed class AccountingEntryService
         if (from is null || to is null || from > to)
         {
             throw new RequestValidationException("INVALID_ACCOUNTING_DATE_RANGE",
-                "Both dates are required and the start date cannot be after the end date.");
+                "Ambas fechas son obligatorias y la fecha inicial no puede ser posterior a la final.");
         }
     }
 

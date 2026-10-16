@@ -55,7 +55,7 @@ public sealed class AuthController : ControllerBase
         AdminLoginResult result = await authenticationService.LoginAsync(request.Email, request.Password, cancellationToken);
         if (!result.Succeeded)
         {
-            return Unauthorized(CreateProblem("Invalid credentials", "INVALID_CREDENTIALS"));
+            return Unauthorized(CreateProblem("Credenciales inválidas", "INVALID_CREDENTIALS"));
         }
 
         ClaimsPrincipal principal = CreatePrincipal(result.Identity!);
@@ -64,6 +64,8 @@ public sealed class AuthController : ControllerBase
             IsPersistent = false,
             AllowRefresh = false
         });
+        HttpContext.User = principal;
+        RegenerateXsrfCookie();
         return NoContent();
     }
 
@@ -86,6 +88,19 @@ public sealed class AuthController : ControllerBase
         string email = User.FindFirstValue(ClaimTypes.Email)!;
         string role = User.FindFirstValue(ClaimTypes.Role)!;
         return Ok(new CurrentAdminResponse(id, email, role));
+    }
+
+    private void RegenerateXsrfCookie()
+    {
+        AntiforgeryTokenSet tokens = antiforgery.GetAndStoreTokens(HttpContext);
+        Response.Cookies.Append(AuthenticationConstants.XsrfCookieName, tokens.RequestToken!, new CookieOptions
+        {
+            HttpOnly = false,
+            Secure = true,
+            SameSite = SameSiteMode.Strict,
+            Path = "/",
+            IsEssential = true
+        });
     }
 
     private static ClaimsPrincipal CreatePrincipal(AdminIdentityDto identity)

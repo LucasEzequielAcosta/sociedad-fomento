@@ -49,7 +49,7 @@ public sealed class FeeGenerationService
     private async Task<FeeRate> GetApplicableRateAsync(DateOnly period, CancellationToken cancellationToken)
     {
         return await context.FindApplicableFeeRateAsync(period, cancellationToken)
-            ?? throw new BusinessRuleException("FEE_RATE_NOT_FOUND", "No fee rate is effective for the supplied month.");
+            ?? throw new BusinessRuleException("FEE_RATE_NOT_FOUND", "No hay un valor de cuota vigente para el mes indicado.");
     }
 
     private static DateOnly NormalizeMonth(DateOnly value) => new(value.Year, value.Month, 1);

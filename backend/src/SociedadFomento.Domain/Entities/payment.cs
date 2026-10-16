@@ -40,7 +40,7 @@ public sealed class Payment
     {
         if (Status == PaymentStatus.Cancelled)
         {
-            throw new InvalidOperationException("The payment is already cancelled.");
+            throw new InvalidOperationException("El pago ya está anulado.");
         }
 
         paymentAllocations.Where(allocation => !allocation.ReleasedAtUtc.HasValue)
@@ -68,7 +68,7 @@ public sealed class Payment
         bool hasInvalidAmount = obligations.Count == 0 || amount <= 0 || obligations.Sum(obligation => obligation.Amount) != amount;
         if (hasInvalidMember || hasInvalidAmount)
         {
-            throw new ArgumentException("The payment must match complete obligations belonging to the member.", nameof(obligations));
+            throw new ArgumentException("El pago debe coincidir con cuotas completas del socio.", nameof(obligations));
         }
     }
 }

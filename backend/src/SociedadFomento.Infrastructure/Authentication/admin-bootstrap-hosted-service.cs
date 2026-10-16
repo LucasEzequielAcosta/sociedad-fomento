@@ -40,8 +40,8 @@ internal sealed class AdminBootstrapHostedService : IHostedService
         }
         catch (SqlException exception) when (exception.Number == 208)
         {
-            logger.LogError("Authentication schema is unavailable. Apply migrations before enabling administrator bootstrap.");
-            throw new InvalidOperationException("Authentication schema is unavailable. Apply migrations before administrator bootstrap.");
+            logger.LogError("El esquema de autenticación no está disponible. Aplique las migraciones antes de habilitar el bootstrap de administrador.");
+            throw new InvalidOperationException("El esquema de autenticación no está disponible. Aplique las migraciones antes del bootstrap de administrador.");
         }
     }
 

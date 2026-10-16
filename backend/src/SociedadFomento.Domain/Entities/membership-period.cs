@@ -26,7 +26,7 @@ public sealed class MembershipPeriod
     {
         if (EndDate.HasValue || currentDate < StartDate)
         {
-            throw new InvalidOperationException("The membership period cannot be closed on the supplied date.");
+            throw new InvalidOperationException("El período de membresía no puede cerrarse en la fecha indicada.");
         }
 
         EndDate = currentDate;

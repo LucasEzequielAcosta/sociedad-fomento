@@ -55,13 +55,13 @@ public sealed class Member
     {
         if (Status != MemberStatus.Inactive)
         {
-            throw new InvalidOperationException("Only an inactive member can be reactivated.");
+            throw new InvalidOperationException("Solo un socio inactivo puede reactivarse.");
         }
 
         DateOnly? lastEndDate = membershipPeriods.Max(period => period.EndDate);
         if (lastEndDate.HasValue && currentDate <= lastEndDate.Value)
         {
-            throw new InvalidOperationException("Reactivation must occur after the latest deactivation date.");
+            throw new InvalidOperationException("La reactivación debe ser posterior a la última baja.");
         }
 
         MembershipPeriod period = new(this, currentDate);
@@ -83,14 +83,14 @@ public sealed class Member
 
     private MembershipPeriod GetOpenPeriod() => Status == MemberStatus.Active
         ? membershipPeriods.Single(period => !period.EndDate.HasValue)
-        : throw new InvalidOperationException("Only an active member can be deactivated.");
+        : throw new InvalidOperationException("Solo un socio activo puede darse de baja.");
 
     private static string EnsureRequired(string value, int maximumLength, string parameterName)
     {
         string normalized = value.Trim();
         return normalized.Length is > 0 && normalized.Length <= maximumLength
             ? normalized
-            : throw new ArgumentException("The value is required and exceeds its allowed length.", parameterName);
+            : throw new ArgumentException("El valor es obligatorio y excede la longitud permitida.", parameterName);
     }
 
     private static string? EnsureOptional(string? value, int maximumLength, string parameterName) => string.IsNullOrWhiteSpace(value)

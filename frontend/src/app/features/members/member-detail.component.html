@@ -1,0 +1,137 @@
+<a mat-button routerLink="/socios" id="back-to-members">← Volver</a>
+@if (member(); as member) {
+  <mat-card class="wide-card" id="member-card">
+    <mat-card-header>
+      <mat-card-title>{{ member.lastName }}, {{ member.firstName }}</mat-card-title>
+      <mat-card-subtitle>
+        DNI {{ member.dni }} ·
+        <span class="status-chip" [class]="'status-chip status-' + member.status.toLowerCase()">
+          {{ member.status === 'Active' ? 'Activo' : 'Inactivo' }}
+        </span>
+      </mat-card-subtitle>
+    </mat-card-header>
+    <mat-card-content>
+      @if (!editing()) {
+        <p>Dirección: {{ member.address }}</p>
+        <p>Nacimiento: {{ member.birthDate | date: 'dd/MM/yyyy' }}</p>
+        <p>Teléfono: {{ member.phone }}</p>
+        @if (member.email) {
+          <p>Email: {{ member.email }}</p>
+        }
+        <p>Alta: {{ member.registrationDate | date: 'dd/MM/yyyy' }}</p>
+      } @else {
+        <form [formGroup]="form" (ngSubmit)="savePersonalData()" id="member-edit-form">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Nombre</mat-label>
+            <input matInput formControlName="firstName" id="edit-firstname" />
+          </mat-form-field>
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Apellido</mat-label>
+            <input matInput formControlName="lastName" id="edit-lastname" />
+          </mat-form-field>
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Dirección</mat-label>
+            <input matInput formControlName="address" id="edit-address" />
+          </mat-form-field>
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Fecha de nacimiento</mat-label>
+            <input matInput [matDatepicker]="editBirthPicker" formControlName="birthDate" id="edit-birthdate" />
+            <mat-datepicker-toggle matIconSuffix [for]="editBirthPicker" />
+            <mat-datepicker #editBirthPicker />
+          </mat-form-field>
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Teléfono</mat-label>
+            <input matInput formControlName="phone" id="edit-phone" />
+          </mat-form-field>
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Email</mat-label>
+            <input matInput type="email" formControlName="email" id="edit-email" />
+          </mat-form-field>
+          <button mat-flat-button color="primary" type="submit" id="edit-save">Guardar</button>
+          <button mat-button type="button" (click)="editing.set(false)" id="edit-cancel">Cancelar</button>
+        </form>
+      }
+    </mat-card-content>
+    <mat-card-actions>
+      @if (!editing()) {
+        <button mat-button (click)="editing.set(true)" id="edit-member">Editar datos</button>
+        @if (member.status === 'Active') {
+          @if (confirming() === 'deactivate') {
+            <span>¿Confirmar baja?</span>
+            <button mat-button color="warn" (click)="confirm('deactivate')" id="confirm-deactivate">Confirmar</button>
+            <button mat-button (click)="confirming.set(null)">Volver</button>
+          } @else {
+            <button mat-button color="warn" (click)="confirming.set('deactivate')" id="deactivate-member">Dar de baja</button>
+          }
+        } @else {
+          @if (confirming() === 'reactivate') {
+            <span>¿Confirmar reactivación?</span>
+            <button mat-button color="primary" (click)="confirm('reactivate')" id="confirm-reactivate">Confirmar</button>
+            <button mat-button (click)="confirming.set(null)">Volver</button>
+          } @else {
+            <button mat-button color="primary" (click)="confirming.set('reactivate')" id="reactivate-member">Reactivar</button>
+          }
+        }
+      }
+    </mat-card-actions>
+  </mat-card>
+}
+@if (statement(); as statement) {
+  <mat-card class="wide-card" id="statement-card">
+    <mat-card-header>
+      <mat-card-title>Estado de cuenta</mat-card-title>
+      <mat-card-subtitle>
+        Total pagado: {{ statement.totalPaid | currency: 'ARS' }} ·
+        Deuda: {{ statement.totalDebt | currency: 'ARS' }}
+      </mat-card-subtitle>
+    </mat-card-header>
+    <mat-card-content>
+      <h3>Cuotas</h3>
+      <div class="table-wrapper">
+        <table mat-table [dataSource]="statement.obligations" class="full-width" id="obligations-table">
+          <ng-container matColumnDef="period">
+            <th mat-header-cell *matHeaderCellDef>Período</th>
+            <td mat-cell *matCellDef="let item">{{ item.period | date: 'MMMM yyyy' }}</td>
+          </ng-container>
+          <ng-container matColumnDef="amount">
+            <th mat-header-cell *matHeaderCellDef>Importe</th>
+            <td mat-cell *matCellDef="let item">{{ item.amount | currency: 'ARS' }}</td>
+          </ng-container>
+          <ng-container matColumnDef="status">
+            <th mat-header-cell *matHeaderCellDef>Estado</th>
+            <td mat-cell *matCellDef="let item">
+              <span class="status-chip" [class]="'status-chip status-' + item.status.toLowerCase()">
+                {{ statusLabel(item.status) }}
+              </span>
+            </td>
+          </ng-container>
+          <tr mat-header-row *matHeaderRowDef="obligationColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: obligationColumns"></tr>
+        </table>
+      </div>
+      <h3>Pagos</h3>
+      <div class="table-wrapper">
+        <table mat-table [dataSource]="statement.payments" class="full-width" id="payments-table">
+          <ng-container matColumnDef="date">
+            <th mat-header-cell *matHeaderCellDef>Fecha</th>
+            <td mat-cell *matCellDef="let item">{{ item.paymentDate | date: 'dd/MM/yyyy' }}</td>
+          </ng-container>
+          <ng-container matColumnDef="amount">
+            <th mat-header-cell *matHeaderCellDef>Importe</th>
+            <td mat-cell *matCellDef="let item">{{ item.amount | currency: 'ARS' }}</td>
+          </ng-container>
+          <ng-container matColumnDef="method">
+            <th mat-header-cell *matHeaderCellDef>Medio</th>
+            <td mat-cell *matCellDef="let item">{{ methodLabel(item.method) }}</td>
+          </ng-container>
+          <ng-container matColumnDef="status">
+            <th mat-header-cell *matHeaderCellDef>Estado</th>
+            <td mat-cell *matCellDef="let item">{{ statusLabel(item.status) }}</td>
+          </ng-container>
+          <tr mat-header-row *matHeaderRowDef="paymentColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: paymentColumns"></tr>
+        </table>
+      </div>
+    </mat-card-content>
+  </mat-card>
+}

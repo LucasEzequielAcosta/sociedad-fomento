@@ -14,7 +14,7 @@ public sealed class AdminUser
         NormalizedEmail = EmailNormalizer.Normalize(email);
         CreatedAtUtc = createdAtUtc.Kind == DateTimeKind.Utc
             ? createdAtUtc
-            : throw new ArgumentException("Created timestamp must be UTC.", nameof(createdAtUtc));
+            : throw new ArgumentException("La fecha de creación debe ser UTC.", nameof(createdAtUtc));
         Role = AdminRole.Admin;
         IsActive = true;
     }
@@ -51,5 +51,5 @@ public sealed class AdminUser
     private static string EnsureRequired(string value, int maximumLength, string parameterName) =>
         value.Length is > 0 && value.Length <= maximumLength
             ? value
-            : throw new ArgumentException("The value is required and exceeds its allowed length.", parameterName);
+            : throw new ArgumentException("El valor es obligatorio y excede la longitud permitida.", parameterName);
 }

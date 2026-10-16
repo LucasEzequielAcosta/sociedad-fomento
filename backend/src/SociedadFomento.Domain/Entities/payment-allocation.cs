@@ -9,7 +9,7 @@ public sealed class PaymentAllocation
     {
         if (!ReferenceEquals(payment.Member, feeObligation.Member))
         {
-            throw new ArgumentException("The payment and obligation must belong to the same member.", nameof(feeObligation));
+            throw new ArgumentException("El pago y la cuota deben pertenecer al mismo socio.", nameof(feeObligation));
         }
 
         Payment = payment;
@@ -30,7 +30,7 @@ public sealed class PaymentAllocation
     {
         if (ReleasedAtUtc.HasValue)
         {
-            throw new InvalidOperationException("The allocation is already released.");
+            throw new InvalidOperationException("La imputación ya fue liberada.");
         }
 
         ReleasedAtUtc = releasedAtUtc;

@@ -1,0 +1,27 @@
+<mat-card id="login-card" class="form-card">
+  <mat-card-header>
+    <mat-card-title>Administración</mat-card-title>
+    <mat-card-subtitle>Sociedad de Fomento Sierra de los Padres</mat-card-subtitle>
+  </mat-card-header>
+  <mat-card-content>
+    <form [formGroup]="form" (ngSubmit)="submit()" id="login-form">
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Email</mat-label>
+        <input matInput type="email" formControlName="email" id="login-email" autocomplete="username" />
+      </mat-form-field>
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Contraseña</mat-label>
+        <input matInput type="password" formControlName="password" id="login-password" autocomplete="current-password" />
+      </mat-form-field>
+      @if (errorMessage(); as message) {
+        <p class="error" id="login-error">{{ message }}</p>
+      }
+      <button mat-flat-button color="primary" type="submit" class="full-width" id="login-submit" [disabled]="busy()">
+        Ingresar
+      </button>
+    </form>
+  </mat-card-content>
+  <mat-card-actions>
+    <a mat-button routerLink="/portal" id="login-portal-link">Soy socio</a>
+  </mat-card-actions>
+</mat-card>

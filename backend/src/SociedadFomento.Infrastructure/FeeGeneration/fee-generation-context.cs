@@ -52,7 +52,7 @@ internal sealed class FeeGenerationContext : IFeeGenerationContext
         }
         catch (DbUpdateException exception) when (IsMemberObligationConflict(exception))
         {
-            throw new BusinessRuleException("FEE_OBLIGATION_DUPLICATE", "A fee obligation already exists for one of the members in the target month.");
+            throw new BusinessRuleException("FEE_OBLIGATION_DUPLICATE", "Ya existe una cuota para alguno de los socios en el mes indicado.");
         }
     }
 

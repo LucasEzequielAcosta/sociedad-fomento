@@ -11,7 +11,7 @@ public static class InvalidModelStateResponseFactory
         ValidationProblemDetails problem = new(context.ModelState)
         {
             Status = StatusCodes.Status400BadRequest,
-            Title = "Invalid request"
+            Title = "Solicitud inválida"
         };
         problem.Extensions["code"] = "INVALID_REQUEST";
         return new BadRequestObjectResult(problem);

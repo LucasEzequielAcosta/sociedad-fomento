@@ -27,9 +27,9 @@ public sealed class PaymentCancellationService
     private async Task CancelWithinTransactionAsync(long paymentId, CancellationToken cancellationToken)
     {
         Payment payment = await context.FindPaymentWithDetailsAsync(paymentId, cancellationToken)
-            ?? throw new ResourceNotFoundException("PAYMENT_NOT_FOUND", $"Payment {paymentId} was not found.");
+            ?? throw new ResourceNotFoundException("PAYMENT_NOT_FOUND", $"No se encontró el pago {paymentId}.");
         AccountingEntry entry = payment.AccountingEntry
-            ?? throw new InvalidOperationException("The payment has no automatic accounting entry.");
+            ?? throw new InvalidOperationException("El pago no tiene un movimiento contable automático.");
         DateTime cancelledAtUtc = clock.UtcNow;
         payment.Cancel(cancelledAtUtc);
         entry.Cancel(cancelledAtUtc);

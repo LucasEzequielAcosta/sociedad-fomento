@@ -27,7 +27,7 @@ public sealed class AdminBootstrapService
         }
         if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(password))
         {
-            throw new InvalidOperationException("Admin bootstrap requires both email and password configuration values.");
+            throw new InvalidOperationException("El bootstrap de administrador requiere email y contraseña configurados.");
         }
 
         return BootstrapConfiguredAsync(email, password, cancellationToken);

@@ -22,7 +22,7 @@ public sealed class FeeRateService
         DateOnly effectiveMonth = NormalizeMonth(model.EffectiveMonth);
         if (await context.ExistsForMonthAsync(effectiveMonth, cancellationToken))
         {
-            throw new BusinessRuleException("FEE_RATE_MONTH_DUPLICATE", "A fee rate already exists for the supplied month.");
+            throw new BusinessRuleException("FEE_RATE_MONTH_DUPLICATE", "Ya existe un valor de cuota para el mes indicado.");
         }
 
         FeeRate feeRate;
@@ -44,7 +44,7 @@ public sealed class FeeRateService
     public async Task<FeeRateDto> GetByIdAsync(long id, CancellationToken cancellationToken = default)
     {
         FeeRateDto? feeRate = await context.GetByIdAsync(id, cancellationToken);
-        return feeRate ?? throw new ResourceNotFoundException("FEE_RATE_NOT_FOUND", "Fee rate not found.");
+        return feeRate ?? throw new ResourceNotFoundException("FEE_RATE_NOT_FOUND", "No se encontró el valor de cuota.");
     }
 
     /// <summary>Returns the complete fee-rate history ordered by effective month.</summary>
@@ -56,7 +56,7 @@ public sealed class FeeRateService
     {
         FeeRate? feeRate = await context.FindApplicableRateAsync(NormalizeMonth(period), cancellationToken);
         return feeRate is null
-            ? throw new ResourceNotFoundException("FEE_RATE_NOT_FOUND", "No fee rate is effective for the supplied month.")
+            ? throw new ResourceNotFoundException("FEE_RATE_NOT_FOUND", "No hay un valor de cuota vigente para el mes indicado.")
             : Map(feeRate);
     }
 

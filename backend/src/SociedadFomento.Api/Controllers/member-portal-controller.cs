@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -23,16 +24,19 @@ public sealed class MemberPortalController : ControllerBase
     private readonly MemberPortalService memberPortalService;
     private readonly MemberStatementService memberStatementService;
     private readonly IClock clock;
+    private readonly IAntiforgery antiforgery;
 
     /// <summary>Creates the member portal controller.</summary>
     public MemberPortalController(
         MemberPortalService memberPortalService,
         MemberStatementService memberStatementService,
-        IClock clock)
+        IClock clock,
+        IAntiforgery antiforgery)
     {
         this.memberPortalService = memberPortalService;
         this.memberStatementService = memberStatementService;
         this.clock = clock;
+        this.antiforgery = antiforgery;
     }
 
     /// <summary>Creates a member session when the supplied DNI belongs to a member.</summary>
@@ -48,7 +52,7 @@ public sealed class MemberPortalController : ControllerBase
             return Unauthorized(new ProblemDetails
             {
                 Status = StatusCodes.Status401Unauthorized,
-                Title = "Invalid credentials",
+                Title = "Credenciales inválidas",
                 Extensions = { ["code"] = "INVALID_CREDENTIALS" }
             });
         }
@@ -64,6 +68,8 @@ public sealed class MemberPortalController : ControllerBase
             IsPersistent = false,
             AllowRefresh = false
         });
+        HttpContext.User = principal;
+        RegenerateXsrfCookie();
         return NoContent();
     }
 
@@ -103,6 +109,19 @@ public sealed class MemberPortalController : ControllerBase
             statement.Payments,
             statement.TotalPaid,
             statement.TotalDebt));
+    }
+
+    private void RegenerateXsrfCookie()
+    {
+        AntiforgeryTokenSet tokens = antiforgery.GetAndStoreTokens(HttpContext);
+        Response.Cookies.Append(AuthenticationConstants.XsrfCookieName, tokens.RequestToken!, new CookieOptions
+        {
+            HttpOnly = false,
+            Secure = true,
+            SameSite = SameSiteMode.Strict,
+            Path = "/",
+            IsEssential = true
+        });
     }
 
     private async Task<MemberStatementDto> GetOwnStatementAsync(CancellationToken cancellationToken)

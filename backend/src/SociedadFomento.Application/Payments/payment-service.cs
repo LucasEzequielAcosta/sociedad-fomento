@@ -24,20 +24,20 @@ public sealed class PaymentService
         Member? member = await context.FindMemberAsync(model.MemberId, cancellationToken);
         if (member is null)
         {
-            throw new ResourceNotFoundException("MEMBER_NOT_FOUND", $"Member {model.MemberId} was not found.");
+            throw new ResourceNotFoundException("MEMBER_NOT_FOUND", $"No se encontró el socio {model.MemberId}.");
         }
 
         List<FeeObligation> obligations = (await context.FindObligationsAsync(model.MemberId, model.ObligationIds, cancellationToken)).ToList();
         if (obligations.Count != model.ObligationIds.Count)
         {
-            throw new RequestValidationException("INVALID_OBLIGATIONS", "One or more selected obligations do not belong to the member or do not exist.");
+            throw new RequestValidationException("INVALID_OBLIGATIONS", "Una o más cuotas seleccionadas no pertenecen al socio o no existen.");
         }
 
         foreach (FeeObligation obligation in obligations)
         {
             if (await context.HasActiveAllocationAsync(obligation.Id, cancellationToken))
             {
-                throw new BusinessRuleException("OBLIGATION_ALREADY_PAID", $"Obligation for {obligation.Period:yyyy-MM} is already paid.");
+                throw new BusinessRuleException("OBLIGATION_ALREADY_PAID", $"La cuota de {obligation.Period:yyyy-MM} ya está pagada.");
             }
         }
 
@@ -69,13 +69,13 @@ public sealed class PaymentService
             if (filter.From is null || filter.To is null || filter.From > filter.To)
             {
                 throw new RequestValidationException("INVALID_PAYMENT_DATE_RANGE",
-                    "Both dates are required and the start date cannot be after the end date.");
+                    "Ambas fechas son obligatorias y la fecha inicial no puede ser posterior a la final.");
             }
         }
 
         if (filter.Method is not null && !Enum.IsDefined(typeof(PaymentMethod), filter.Method.Value))
         {
-            throw new RequestValidationException("INVALID_PAYMENT_METHOD", "The payment method is not valid.");
+            throw new RequestValidationException("INVALID_PAYMENT_METHOD", "El medio de pago no es válido.");
         }
 
         return await context.GetPaymentsAsync(filter, cancellationToken);
@@ -85,23 +85,23 @@ public sealed class PaymentService
     {
         if (model.ObligationIds.Count == 0)
         {
-            throw new RequestValidationException("MISSING_OBLIGATIONS", "At least one fee obligation must be selected.");
+            throw new RequestValidationException("MISSING_OBLIGATIONS", "Debe seleccionar al menos una cuota.");
         }
 
         if (model.Amount <= 0)
         {
-            throw new RequestValidationException("INVALID_PAYMENT_AMOUNT", "Payment amount must be greater than zero.");
+            throw new RequestValidationException("INVALID_PAYMENT_AMOUNT", "El importe del pago debe ser mayor a cero.");
         }
 
         if (!Enum.IsDefined(typeof(PaymentMethod), model.Method))
         {
-            throw new RequestValidationException("INVALID_PAYMENT_METHOD", "The payment method is not valid.");
+            throw new RequestValidationException("INVALID_PAYMENT_METHOD", "El medio de pago no es válido.");
         }
 
         HashSet<long> uniqueIds = new(model.ObligationIds);
         if (uniqueIds.Count != model.ObligationIds.Count)
         {
-            throw new RequestValidationException("DUPLICATE_OBLIGATIONS", "Obligation identifiers must be unique.");
+            throw new RequestValidationException("DUPLICATE_OBLIGATIONS", "Las cuotas seleccionadas no pueden repetirse.");
         }
     }
 

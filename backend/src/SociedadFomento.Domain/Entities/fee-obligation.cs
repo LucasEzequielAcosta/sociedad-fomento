@@ -14,7 +14,7 @@ public sealed class FeeObligation
     {
         if (!ReferenceEquals(membershipPeriod.Member, member))
         {
-            throw new ArgumentException("The membership period must belong to the obligation member.", nameof(membershipPeriod));
+            throw new ArgumentException("El período de membresía debe pertenecer al socio de la cuota.", nameof(membershipPeriod));
         }
 
         Member = member;

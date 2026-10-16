@@ -37,3 +37,76 @@ body {
   height: 100%;
 }
 /* You can add global styles to this file, and also import other style files */
+
+.form-card {
+  max-width: 420px;
+  margin: 48px auto;
+}
+
+.wide-card {
+  margin-bottom: 24px;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.error {
+  color: var(--mat-sys-error);
+}
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.table-wrapper {
+  overflow-x: auto;
+}
+
+table.full-width {
+  width: 100%;
+}
+
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.stat-value {
+  font: var(--mat-sys-headline-medium);
+}
+
+.status-chip {
+  padding: 2px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.status-paid,
+.status-active,
+.status-income {
+  background: var(--mat-sys-tertiary-container);
+  color: var(--mat-sys-on-tertiary-container);
+}
+
+.status-overdue,
+.status-cancelled,
+.status-expense,
+.status-inactive {
+  background: var(--mat-sys-error-container);
+  color: var(--mat-sys-on-error-container);
+}
+
+.status-pending,
+.status-future {
+  background: var(--mat-sys-secondary-container);
+  color: var(--mat-sys-on-secondary-container);
+}
+

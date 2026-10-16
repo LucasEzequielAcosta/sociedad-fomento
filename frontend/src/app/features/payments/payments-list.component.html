@@ -1,0 +1,80 @@
+<h1>Pagos</h1>
+<form [formGroup]="filters" (ngSubmit)="search()" class="filters" id="payment-filters">
+  <mat-form-field appearance="outline">
+    <mat-label>ID de socio</mat-label>
+    <input matInput type="number" formControlName="memberId" id="filter-member" />
+  </mat-form-field>
+  <mat-form-field appearance="outline">
+    <mat-label>Desde</mat-label>
+    <input matInput [matDatepicker]="fromPicker" formControlName="from" id="filter-from" />
+    <mat-datepicker-toggle matIconSuffix [for]="fromPicker" />
+    <mat-datepicker #fromPicker />
+  </mat-form-field>
+  <mat-form-field appearance="outline">
+    <mat-label>Hasta</mat-label>
+    <input matInput [matDatepicker]="toPicker" formControlName="to" id="filter-to" />
+    <mat-datepicker-toggle matIconSuffix [for]="toPicker" />
+    <mat-datepicker #toPicker />
+  </mat-form-field>
+  <mat-form-field appearance="outline">
+    <mat-label>Medio</mat-label>
+    <mat-select formControlName="method" id="filter-method">
+      <mat-option value="">Todos</mat-option>
+      <mat-option value="Cash">Efectivo</mat-option>
+      <mat-option value="BankTransfer">Transferencia</mat-option>
+      <mat-option value="DirectDebit">Débito automático</mat-option>
+    </mat-select>
+  </mat-form-field>
+  <button mat-flat-button color="primary" type="submit" id="filter-submit">Buscar</button>
+  <a mat-button routerLink="/pagos/nuevo" id="new-payment">Registrar pago</a>
+  <a mat-button [href]="exportUrl()" id="export-payments">Exportar CSV</a>
+</form>
+<div class="table-wrapper">
+  <table mat-table [dataSource]="payments()" class="full-width" id="payments-table">
+    <ng-container matColumnDef="date">
+      <th mat-header-cell *matHeaderCellDef>Fecha</th>
+      <td mat-cell *matCellDef="let item">{{ item.paymentDate | date: 'dd/MM/yyyy' }}</td>
+    </ng-container>
+    <ng-container matColumnDef="member">
+      <th mat-header-cell *matHeaderCellDef>Socio</th>
+      <td mat-cell *matCellDef="let item">
+        <a [routerLink]="['/socios', item.memberId]">{{ item.memberLastName }}, {{ item.memberFirstName }}</a>
+      </td>
+    </ng-container>
+    <ng-container matColumnDef="periods">
+      <th mat-header-cell *matHeaderCellDef>Períodos</th>
+      <td mat-cell *matCellDef="let item">{{ item.periods.join(', ') }}</td>
+    </ng-container>
+    <ng-container matColumnDef="amount">
+      <th mat-header-cell *matHeaderCellDef>Importe</th>
+      <td mat-cell *matCellDef="let item">{{ item.amount | currency: 'ARS' }}</td>
+    </ng-container>
+    <ng-container matColumnDef="method">
+      <th mat-header-cell *matHeaderCellDef>Medio</th>
+      <td mat-cell *matCellDef="let item">{{ methodLabel(item.method) }}</td>
+    </ng-container>
+    <ng-container matColumnDef="status">
+      <th mat-header-cell *matHeaderCellDef>Estado</th>
+      <td mat-cell *matCellDef="let item">
+        <span class="status-chip" [class]="'status-chip status-' + item.status.toLowerCase()">
+          {{ item.status === 'Active' ? 'Activo' : 'Anulado' }}
+        </span>
+      </td>
+    </ng-container>
+    <ng-container matColumnDef="actions">
+      <th mat-header-cell *matHeaderCellDef></th>
+      <td mat-cell *matCellDef="let item">
+        @if (item.status === 'Active') {
+          @if (cancellingId() === item.id) {
+            <button mat-button color="warn" (click)="cancel(item.id)" id="confirm-cancel-{{ item.id }}">Confirmar</button>
+            <button mat-button (click)="cancellingId.set(null)">Volver</button>
+          } @else {
+            <button mat-button color="warn" (click)="cancellingId.set(item.id)" id="cancel-payment-{{ item.id }}">Anular</button>
+          }
+        }
+      </td>
+    </ng-container>
+    <tr mat-header-row *matHeaderRowDef="columns"></tr>
+    <tr mat-row *matRowDef="let row; columns: columns"></tr>
+  </table>
+</div>

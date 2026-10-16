@@ -41,7 +41,7 @@ public sealed class AdminBootstrapHostedServiceTests
             InvalidOperationException exception = await Assert.ThrowsAsync<InvalidOperationException>(() =>
                 hostedService.StartAsync(CancellationToken.None));
 
-            Assert.Contains("Apply migrations", exception.Message, StringComparison.OrdinalIgnoreCase);
+            Assert.Contains("migraciones", exception.Message, StringComparison.OrdinalIgnoreCase);
             Assert.DoesNotContain(password, exception.Message, StringComparison.Ordinal);
             Assert.DoesNotContain(email, exception.Message, StringComparison.OrdinalIgnoreCase);
             await using SqlConnection connection = new(connectionString);

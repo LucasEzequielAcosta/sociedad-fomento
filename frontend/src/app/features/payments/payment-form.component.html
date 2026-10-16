@@ -1,0 +1,65 @@
+<h1>Registrar pago</h1>
+<mat-card class="wide-card" id="member-search-card">
+  <mat-card-content>
+    <form [formGroup]="dniForm" (ngSubmit)="findMember()" class="filters" id="member-search-form">
+      <mat-form-field appearance="outline">
+        <mat-label>DNI del socio</mat-label>
+        <input matInput formControlName="dni" id="payment-dni" />
+      </mat-form-field>
+      <button mat-flat-button color="primary" type="submit" id="search-member">Buscar</button>
+    </form>
+    @if (memberNotFound()) {
+      <p class="error" id="member-not-found">No se encontró un socio con ese DNI.</p>
+    }
+  </mat-card-content>
+</mat-card>
+@if (member(); as member) {
+  <mat-card class="wide-card" id="payment-card">
+    <mat-card-header>
+      <mat-card-title>{{ member.lastName }}, {{ member.firstName }}</mat-card-title>
+      <mat-card-subtitle>DNI {{ member.dni }}</mat-card-subtitle>
+    </mat-card-header>
+    <mat-card-content>
+      <form [formGroup]="paymentForm" id="payment-form">
+        <h3>Cuotas a cancelar</h3>
+        @for (obligation of payableObligations(); track obligation.id) {
+          <p>
+            <mat-checkbox
+              [checked]="selectedIds().has(obligation.id)"
+              (change)="toggle(obligation.id, $event.checked)"
+              id="obligation-{{ obligation.id }}"
+            >
+              {{ obligation.period | date: 'MMMM yyyy' }} — {{ obligation.amount | currency: 'ARS' }}
+              ({{ obligation.status === 'Overdue' ? 'vencida' : obligation.status === 'Future' ? 'futura' : 'pendiente' }})
+            </mat-checkbox>
+          </p>
+        } @empty {
+          <p>El socio no tiene cuotas impagas.</p>
+        }
+        <div class="filters">
+          <mat-form-field appearance="outline">
+            <mat-label>Fecha de pago</mat-label>
+            <input matInput [matDatepicker]="paymentPicker" formControlName="paymentDate" id="payment-date" />
+            <mat-datepicker-toggle matIconSuffix [for]="paymentPicker" />
+            <mat-datepicker #paymentPicker />
+          </mat-form-field>
+          <mat-form-field appearance="outline">
+            <mat-label>Medio de pago</mat-label>
+            <mat-select formControlName="method" id="payment-method">
+              <mat-option value="Cash">Efectivo</mat-option>
+              <mat-option value="BankTransfer">Transferencia</mat-option>
+              <mat-option value="DirectDebit">Débito automático</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+        <p><strong>Total: {{ total() | currency: 'ARS' }}</strong></p>
+      </form>
+    </mat-card-content>
+    <mat-card-actions>
+      <button mat-flat-button color="primary" (click)="submit()" id="payment-submit" [disabled]="busy() || selectedIds().size === 0">
+        Registrar pago
+      </button>
+      <a mat-button routerLink="/pagos" id="payment-cancel">Cancelar</a>
+    </mat-card-actions>
+  </mat-card>
+}

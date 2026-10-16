@@ -190,6 +190,8 @@ npm ci
 npm start
 ```
 
+The dev server proxies `/api` to `https://localhost:7214` (see `proxy.conf.json`), so run the backend with the `https` launch profile: `dotnet run --project backend/src/SociedadFomento.Api --launch-profile https`.
+
 Use `npm run build` for a production build and `npm test -- --watch=false` for a single test run.
 
 The project should be developed incrementally. Each feature should be implemented, tested and reviewed before moving to the next feature.
@@ -210,7 +212,14 @@ Implemented backend modules:
 10. Administrative dashboard (active/inactive members, pending/overdue obligations, total debt, current-month income/expense/balance).
 11. Payment listing with filters, payment cancellation endpoint, and CSV exports (members, payments, accounting entries).
 
+Frontend (Angular 22 + Material, served via `/api` proxy):
+
+- Admin login and member portal login (DNI only).
+- Dashboard, member list/detail/statement with lifecycle actions, member registration.
+- Fee-rate management and monthly obligation generation.
+- Payment registration with obligation selection and payment cancellation.
+- Accounting entries with filters, manual income/expense registration, cancellation, summary and CSV exports.
+
 Pending work:
 
-- Frontend user interfaces.
 - Final end-to-end testing, corrections and deployment.

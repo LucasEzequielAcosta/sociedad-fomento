@@ -1,0 +1,43 @@
+<h1>Resumen</h1>
+@if (dashboard(); as data) {
+  <section class="cards" id="dashboard-members">
+    <mat-card>
+      <mat-card-header><mat-card-title>Socios activos</mat-card-title></mat-card-header>
+      <mat-card-content><p class="stat-value" id="stat-active">{{ data.members.active }}</p></mat-card-content>
+    </mat-card>
+    <mat-card>
+      <mat-card-header><mat-card-title>Socios inactivos</mat-card-title></mat-card-header>
+      <mat-card-content><p class="stat-value" id="stat-inactive">{{ data.members.inactive }}</p></mat-card-content>
+    </mat-card>
+    <mat-card>
+      <mat-card-header><mat-card-title>Cuotas pendientes</mat-card-title></mat-card-header>
+      <mat-card-content><p class="stat-value" id="stat-pending">{{ data.obligations.pending }}</p></mat-card-content>
+    </mat-card>
+    <mat-card>
+      <mat-card-header><mat-card-title>Cuotas vencidas</mat-card-title></mat-card-header>
+      <mat-card-content><p class="stat-value" id="stat-overdue">{{ data.obligations.overdue }}</p></mat-card-content>
+    </mat-card>
+    <mat-card>
+      <mat-card-header><mat-card-title>Deuda total</mat-card-title></mat-card-header>
+      <mat-card-content><p class="stat-value" id="stat-debt">{{ data.obligations.totalDebt | currency: 'ARS' }}</p></mat-card-content>
+    </mat-card>
+  </section>
+  <h2>Economía del mes ({{ data.economy.from | date: 'MMMM yyyy' }})</h2>
+  <section class="cards" id="dashboard-economy">
+    <mat-card>
+      <mat-card-header><mat-card-title>Ingresos</mat-card-title></mat-card-header>
+      <mat-card-content><p class="stat-value" id="stat-income">{{ data.economy.totalIncome | currency: 'ARS' }}</p></mat-card-content>
+    </mat-card>
+    <mat-card>
+      <mat-card-header><mat-card-title>Egresos</mat-card-title></mat-card-header>
+      <mat-card-content><p class="stat-value" id="stat-expense">{{ data.economy.totalExpense | currency: 'ARS' }}</p></mat-card-content>
+    </mat-card>
+    <mat-card>
+      <mat-card-header><mat-card-title>Saldo</mat-card-title></mat-card-header>
+      <mat-card-content><p class="stat-value" id="stat-balance">{{ data.economy.balance | currency: 'ARS' }}</p></mat-card-content>
+    </mat-card>
+  </section>
+  <a mat-flat-button color="primary" routerLink="/pagos/nuevo" id="dashboard-new-payment">Registrar pago</a>
+} @else {
+  <p>Cargando…</p>
+}

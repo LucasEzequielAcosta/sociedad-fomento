@@ -12,6 +12,6 @@ public static class DniNormalizer
         string normalized = value.Trim().Replace(".", string.Empty).Replace("-", string.Empty).Replace(" ", string.Empty);
         return normalized.Length is > 0 && normalized.Length <= MemberFieldLengths.Dni
             ? normalized
-            : throw new ArgumentException("The DNI is required and exceeds its allowed length.", nameof(value));
+            : throw new ArgumentException("El DNI es obligatorio y excede la longitud permitida.", nameof(value));
     }
 }

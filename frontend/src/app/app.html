@@ -1,1 +1,19 @@
-<router-outlet id="application-router-outlet" />
+@if (auth.currentAdmin()) {
+  <mat-toolbar color="primary" id="app-toolbar">
+    <span id="app-title">Sociedad de Fomento</span>
+    <nav id="app-nav">
+      <a mat-button routerLink="/dashboard" id="nav-dashboard">Inicio</a>
+      <a mat-button routerLink="/socios" id="nav-members">Socios</a>
+      <a mat-button routerLink="/cuotas" id="nav-fees">Cuotas</a>
+      <a mat-button routerLink="/pagos" id="nav-payments">Pagos</a>
+      <a mat-button routerLink="/contabilidad" id="nav-accounting">Contabilidad</a>
+    </nav>
+    <span class="spacer"></span>
+    <button mat-icon-button (click)="logout()" id="logout-button" aria-label="Cerrar sesión">
+      <mat-icon>logout</mat-icon>
+    </button>
+  </mat-toolbar>
+}
+<main id="app-main" class="page">
+  <router-outlet id="application-router-outlet" />
+</main>

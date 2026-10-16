@@ -37,7 +37,7 @@ public sealed class MemberService
     {
         string normalizedDni = NormalizeDni(dni);
         return await context.GetByDniAsync(normalizedDni, cancellationToken)
-            ?? throw new ResourceNotFoundException("MEMBER_NOT_FOUND", $"Member with DNI {normalizedDni} was not found.");
+            ?? throw new ResourceNotFoundException("MEMBER_NOT_FOUND", $"No se encontró un socio con el DNI {normalizedDni}.");
     }
 
     /// <summary>Searches members using optional filters and bounded pagination.</summary>
@@ -105,7 +105,7 @@ public sealed class MemberService
         string normalizedDni = NormalizeDni(model.Dni);
         if (await context.DniExistsAsync(normalizedDni, cancellationToken))
         {
-            throw new BusinessRuleException("DNI_DUPLICATE", "A member with the supplied DNI already exists.");
+            throw new BusinessRuleException("DNI_DUPLICATE", "Ya existe un socio con el DNI ingresado.");
         }
 
         DateOnly currentDate = clock.Today;
@@ -144,7 +144,7 @@ public sealed class MemberService
     private async Task<FeeRate> GetApplicableRateAsync(DateOnly period, CancellationToken cancellationToken)
     {
         return await context.FindApplicableFeeRateAsync(NormalizeMonth(period), cancellationToken)
-            ?? throw new BusinessRuleException("FEE_RATE_NOT_FOUND", "No fee rate is effective for the current month.");
+            ?? throw new BusinessRuleException("FEE_RATE_NOT_FOUND", "No hay un valor de cuota vigente para el mes actual.");
     }
 
     private static Member CreateMember(string dni, MemberPersonalData data, DateOnly registrationDate)
@@ -196,11 +196,11 @@ public sealed class MemberService
     {
         if (data.BirthDate == default || data.BirthDate > clock.Today)
         {
-            throw new RequestValidationException("INVALID_BIRTH_DATE", "Birth date is required and cannot be in the future.");
+            throw new RequestValidationException("INVALID_BIRTH_DATE", "La fecha de nacimiento es obligatoria y no puede ser futura.");
         }
         if (data.Email is not null && !MailAddress.TryCreate(data.Email, out _))
         {
-            throw new RequestValidationException("INVALID_EMAIL", "Email address is invalid.");
+            throw new RequestValidationException("INVALID_EMAIL", "El email no es válido.");
         }
     }
 
@@ -208,7 +208,7 @@ public sealed class MemberService
     {
         if (criteria.Page < 1 || criteria.PageSize is < 1 or > 100)
         {
-            throw new RequestValidationException("INVALID_PAGINATION", "Page must be positive and page size must be between 1 and 100.");
+            throw new RequestValidationException("INVALID_PAGINATION", "La página debe ser positiva y el tamaño debe estar entre 1 y 100.");
         }
     }
 
@@ -230,7 +230,7 @@ public sealed class MemberService
 
     private static DateOnly NormalizeMonth(DateOnly value) => new(value.Year, value.Month, 1);
     private static string? NormalizeFilter(string? value) => string.IsNullOrWhiteSpace(value) ? null : value.Trim();
-    private static Member ThrowMemberNotFound(long memberId) => throw new ResourceNotFoundException("MEMBER_NOT_FOUND", $"Member {memberId} was not found.");
-    private static MemberDetailDto ThrowMemberDetailNotFound(long memberId) => throw new ResourceNotFoundException("MEMBER_NOT_FOUND", $"Member {memberId} was not found.");
-    private static IReadOnlyList<MembershipPeriodDto> ThrowHistoryNotFound(long memberId) => throw new ResourceNotFoundException("MEMBER_NOT_FOUND", $"Member {memberId} was not found.");
+    private static Member ThrowMemberNotFound(long memberId) => throw new ResourceNotFoundException("MEMBER_NOT_FOUND", $"No se encontró el socio {memberId}.");
+    private static MemberDetailDto ThrowMemberDetailNotFound(long memberId) => throw new ResourceNotFoundException("MEMBER_NOT_FOUND", $"No se encontró el socio {memberId}.");
+    private static IReadOnlyList<MembershipPeriodDto> ThrowHistoryNotFound(long memberId) => throw new ResourceNotFoundException("MEMBER_NOT_FOUND", $"No se encontró el socio {memberId}.");
 }

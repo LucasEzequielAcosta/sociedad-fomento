@@ -48,7 +48,7 @@ internal sealed class FeeRateContext : IFeeRateContext
         }
         catch (DbUpdateException exception) when (IsUniqueMonthConflict(exception))
         {
-            throw new BusinessRuleException("FEE_RATE_MONTH_DUPLICATE", "A fee rate already exists for the supplied month.");
+            throw new BusinessRuleException("FEE_RATE_MONTH_DUPLICATE", "Ya existe un valor de cuota para el mes indicado.");
         }
     }
 

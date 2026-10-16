@@ -32,9 +32,9 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
     options.ExpireTimeSpan = TimeSpan.FromHours(8);
     options.SlidingExpiration = false;
     options.Events.OnRedirectToLogin = context => AuthenticationProblemWriter.WriteAsync(
-        context.HttpContext, StatusCodes.Status401Unauthorized, "Authentication required", "AUTHENTICATION_REQUIRED");
+        context.HttpContext, StatusCodes.Status401Unauthorized, "Autenticación requerida", "AUTHENTICATION_REQUIRED");
     options.Events.OnRedirectToAccessDenied = context => AuthenticationProblemWriter.WriteAsync(
-        context.HttpContext, StatusCodes.Status403Forbidden, "Access forbidden", "FORBIDDEN");
+        context.HttpContext, StatusCodes.Status403Forbidden, "Acceso denegado", "FORBIDDEN");
 }).AddCookie(AuthenticationConstants.MemberScheme, options =>
 {
     options.Cookie.Name = AuthenticationConstants.MemberCookieName;
@@ -44,9 +44,9 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
     options.ExpireTimeSpan = TimeSpan.FromHours(8);
     options.SlidingExpiration = false;
     options.Events.OnRedirectToLogin = context => AuthenticationProblemWriter.WriteAsync(
-        context.HttpContext, StatusCodes.Status401Unauthorized, "Authentication required", "AUTHENTICATION_REQUIRED");
+        context.HttpContext, StatusCodes.Status401Unauthorized, "Autenticación requerida", "AUTHENTICATION_REQUIRED");
     options.Events.OnRedirectToAccessDenied = context => AuthenticationProblemWriter.WriteAsync(
-        context.HttpContext, StatusCodes.Status403Forbidden, "Access forbidden", "FORBIDDEN");
+        context.HttpContext, StatusCodes.Status403Forbidden, "Acceso denegado", "FORBIDDEN");
 });
 builder.Services.AddAuthorization();
 builder.Services.AddRateLimiter(options =>
@@ -70,12 +70,12 @@ builder.Services.AddRateLimiter(options =>
                 AutoReplenishment = true
             }));
     options.OnRejected = (context, _) => new ValueTask(AuthenticationProblemWriter.WriteAsync(
-        context.HttpContext, StatusCodes.Status429TooManyRequests, "Too many requests", "RATE_LIMITED"));
+        context.HttpContext, StatusCodes.Status429TooManyRequests, "Demasiados intentos. Espere un minuto y vuelva a intentar.", "RATE_LIMITED"));
 });
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 string connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
-    ?? throw new InvalidOperationException("The DefaultConnection connection string is required.");
+    ?? throw new InvalidOperationException("La cadena de conexión DefaultConnection es obligatoria.");
 builder.Services.AddInfrastructure(connectionString);
 
 WebApplication app = builder.Build();

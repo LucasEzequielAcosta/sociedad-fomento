@@ -1,0 +1,23 @@
+<mat-card class="form-card" id="portal-login-card">
+  <mat-card-header>
+    <mat-card-title>Portal del socio</mat-card-title>
+    <mat-card-subtitle>Sociedad de Fomento Sierra de los Padres</mat-card-subtitle>
+  </mat-card-header>
+  <mat-card-content>
+    <form [formGroup]="form" (ngSubmit)="submit()" id="portal-login-form">
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>DNI</mat-label>
+        <input matInput formControlName="dni" id="portal-dni" autocomplete="off" />
+      </mat-form-field>
+      @if (errorMessage(); as message) {
+        <p class="error" id="portal-login-error">{{ message }}</p>
+      }
+      <button mat-flat-button color="primary" type="submit" class="full-width" id="portal-login-submit" [disabled]="busy()">
+        Ingresar
+      </button>
+    </form>
+  </mat-card-content>
+  <mat-card-actions>
+    <a mat-button routerLink="/login" id="portal-admin-link">Soy administrador</a>
+  </mat-card-actions>
+</mat-card>

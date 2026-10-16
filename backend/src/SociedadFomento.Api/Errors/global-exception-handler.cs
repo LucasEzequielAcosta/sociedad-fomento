@@ -24,7 +24,7 @@ public sealed class GlobalExceptionHandler : IExceptionHandler
         (int status, string title, string code) = Map(exception);
         if (status == StatusCodes.Status500InternalServerError)
         {
-            logger.LogError(exception, "An unexpected application error occurred.");
+            logger.LogError(exception, "Ocurrió un error inesperado en la aplicación.");
         }
 
         ProblemDetails problem = new() { Status = status, Title = title, Detail = SafeDetail(exception, status) };
@@ -40,14 +40,14 @@ public sealed class GlobalExceptionHandler : IExceptionHandler
 
     private static (int Status, string Title, string Code) Map(Exception exception) => exception switch
     {
-        RequestValidationException validation => (StatusCodes.Status400BadRequest, "Invalid request", validation.Code),
-        ResourceNotFoundException notFound => (StatusCodes.Status404NotFound, "Resource not found", notFound.Code),
-        BusinessRuleException conflict => (StatusCodes.Status409Conflict, "Business rule conflict", conflict.Code),
-        AntiforgeryValidationException => (StatusCodes.Status400BadRequest, "Invalid antiforgery token", "INVALID_ANTIFORGERY_TOKEN"),
-        _ => (StatusCodes.Status500InternalServerError, "Unexpected error", "UNEXPECTED_ERROR")
+        RequestValidationException validation => (StatusCodes.Status400BadRequest, "Solicitud inválida", validation.Code),
+        ResourceNotFoundException notFound => (StatusCodes.Status404NotFound, "Recurso no encontrado", notFound.Code),
+        BusinessRuleException conflict => (StatusCodes.Status409Conflict, "Conflicto de regla de negocio", conflict.Code),
+        AntiforgeryValidationException => (StatusCodes.Status400BadRequest, "Token de seguridad inválido", "INVALID_ANTIFORGERY_TOKEN"),
+        _ => (StatusCodes.Status500InternalServerError, "Error inesperado", "UNEXPECTED_ERROR")
     };
 
     private static string SafeDetail(Exception exception, int status) => status == StatusCodes.Status500InternalServerError
-        ? "An unexpected error occurred."
+        ? "Ocurrió un error inesperado."
         : exception.Message;
 }

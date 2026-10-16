@@ -54,7 +54,7 @@ public sealed class AccountingEntry
     {
         if (Status == AccountingEntryStatus.Cancelled)
         {
-            throw new InvalidOperationException("The accounting entry is already cancelled.");
+            throw new InvalidOperationException("El movimiento contable ya está anulado.");
         }
 
         Status = AccountingEntryStatus.Cancelled;
@@ -66,6 +66,6 @@ public sealed class AccountingEntry
         string concept = value.Trim();
         return concept.Length is > 0 && concept.Length <= AccountingEntryFieldLengths.Concept
             ? concept
-            : throw new ArgumentException($"The concept is required and cannot exceed {AccountingEntryFieldLengths.Concept} characters.", nameof(value));
+            : throw new ArgumentException($"El concepto es obligatorio y no puede exceder {AccountingEntryFieldLengths.Concept} caracteres.", nameof(value));
     }
 }

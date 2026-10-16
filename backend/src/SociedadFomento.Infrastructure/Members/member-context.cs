@@ -93,7 +93,7 @@ internal sealed class MemberContext : IMemberContext
         }
         catch (DbUpdateException exception) when (IsDniConflict(exception))
         {
-            throw new BusinessRuleException("DNI_DUPLICATE", "A member with the supplied DNI already exists.");
+            throw new BusinessRuleException("DNI_DUPLICATE", "Ya existe un socio con el DNI ingresado.");
         }
         catch (DbUpdateException exception) when (IsMemberStateConflict(exception))
         {
@@ -152,5 +152,5 @@ internal sealed class MemberContext : IMemberContext
         sqlException.Message.Contains(constraintName, StringComparison.OrdinalIgnoreCase);
 
     private static BusinessRuleException MemberStateConflict() => new(
-        "MEMBER_STATE_CONFLICT", "The member state changed concurrently. Reload the member and retry.");
+        "MEMBER_STATE_CONFLICT", "El estado del socio cambió concurrentemente. Recargue el socio y reintente.");
 }

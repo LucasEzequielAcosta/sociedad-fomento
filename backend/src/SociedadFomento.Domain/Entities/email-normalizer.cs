@@ -12,6 +12,6 @@ public static class EmailNormalizer
         string normalized = email.Trim().ToUpperInvariant();
         return normalized.Length <= AdminUserFieldLengths.NormalizedEmail
             ? normalized
-            : throw new ArgumentException("Email exceeds its allowed length.", nameof(email));
+            : throw new ArgumentException("El email excede la longitud permitida.", nameof(email));
     }
 }

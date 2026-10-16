@@ -23,7 +23,7 @@ public sealed class MemberStatementService
         Member? member = await context.GetMemberAsync(model.MemberId, cancellationToken);
         if (member is null)
         {
-            throw new ResourceNotFoundException("MEMBER_NOT_FOUND", $"Member {model.MemberId} was not found.");
+            throw new ResourceNotFoundException("MEMBER_NOT_FOUND", $"No se encontró el socio {model.MemberId}.");
         }
 
         IReadOnlyList<FeeObligation> obligations = await context.GetObligationsAsync(model.MemberId, cancellationToken);
