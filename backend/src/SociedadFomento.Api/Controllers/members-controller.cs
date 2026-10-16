@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SociedadFomento.Api.Contracts.Members;
+using SociedadFomento.Api.Exports;
 using SociedadFomento.Application.Members;
 using SociedadFomento.Application.Members.Dto;
 using SociedadFomento.Application.Members.Models;
@@ -56,6 +57,28 @@ public sealed class MembersController : ControllerBase
     {
         MemberSearchCriteria criteria = new(dni, name, lastName, page, pageSize);
         return Ok(await memberService.SearchAsync(criteria, cancellationToken));
+    }
+
+    /// <summary>Exports members as CSV filtered by DNI, name and last name.</summary>
+    [HttpGet("export")]
+    public async Task<IActionResult> Export(
+        [FromQuery] string? dni, [FromQuery] string? name, [FromQuery] string? lastName, CancellationToken cancellationToken)
+    {
+        IReadOnlyList<MemberDetailDto> members = await memberService.GetAllDetailsAsync(
+            new MemberSearchCriteria(dni, name, lastName), cancellationToken);
+        string csv = CsvWriter.Write(
+            ["Dni", "Nombre", "Apellido", "Direccion", "Nacimiento", "Telefono", "Email", "Alta", "Estado"],
+            members.Select(member => (IReadOnlyList<string?>)[
+                member.Dni,
+                member.FirstName,
+                member.LastName,
+                member.Address,
+                member.BirthDate.ToString("yyyy-MM-dd"),
+                member.Phone,
+                member.Email,
+                member.RegistrationDate.ToString("yyyy-MM-dd"),
+                member.Status.ToString()]));
+        return File(CsvWriter.ToUtf8Bytes(csv), "text/csv", "socios.csv");
     }
 
     /// <summary>Updates editable personal member data.</summary>

@@ -61,6 +61,26 @@ public sealed class PaymentService
         }, cancellationToken);
     }
 
+    /// <summary>Returns payments matching the supplied member, date-range and method filters.</summary>
+    public async Task<IReadOnlyList<PaymentListItemDto>> GetPaymentsAsync(PaymentFilter filter, CancellationToken cancellationToken = default)
+    {
+        if (filter.From is not null || filter.To is not null)
+        {
+            if (filter.From is null || filter.To is null || filter.From > filter.To)
+            {
+                throw new RequestValidationException("INVALID_PAYMENT_DATE_RANGE",
+                    "Both dates are required and the start date cannot be after the end date.");
+            }
+        }
+
+        if (filter.Method is not null && !Enum.IsDefined(typeof(PaymentMethod), filter.Method.Value))
+        {
+            throw new RequestValidationException("INVALID_PAYMENT_METHOD", "The payment method is not valid.");
+        }
+
+        return await context.GetPaymentsAsync(filter, cancellationToken);
+    }
+
     private static void ValidateModel(CreatePaymentModel model)
     {
         if (model.ObligationIds.Count == 0)

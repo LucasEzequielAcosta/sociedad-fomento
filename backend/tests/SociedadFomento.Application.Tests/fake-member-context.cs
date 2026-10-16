@@ -36,6 +36,9 @@ internal sealed class FakeMemberContext : IMemberContext
         return Task.FromResult(new PagedResult<MemberSummaryDto>(items, criteria.Page, criteria.PageSize, items.Count));
     }
 
+    public Task<IReadOnlyList<MemberDetailDto>> GetDetailsAsync(MemberSearchCriteria criteria, CancellationToken cancellationToken) =>
+        Task.FromResult<IReadOnlyList<MemberDetailDto>>(Members.Select(Map).ToList());
+
     public Task<IReadOnlyList<MembershipPeriodDto>?> GetHistoryAsync(long memberId, CancellationToken cancellationToken)
     {
         Member? member = Members.SingleOrDefault();

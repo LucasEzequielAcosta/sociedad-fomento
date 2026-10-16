@@ -53,6 +53,17 @@ internal sealed class MemberContext : IMemberContext
         return new PagedResult<MemberSummaryDto>(items, criteria.Page, criteria.PageSize, totalCount);
     }
 
+    public async Task<IReadOnlyList<MemberDetailDto>> GetDetailsAsync(MemberSearchCriteria criteria, CancellationToken cancellationToken)
+    {
+        List<MemberDetailDto> members = await ApplyFilters(dbContext.Members.AsNoTracking(), criteria)
+            .OrderBy(member => member.LastName).ThenBy(member => member.FirstName).ThenBy(member => member.Id)
+            .Select(member => new MemberDetailDto(
+                member.Id, member.Dni, member.FirstName, member.LastName, member.Address, member.BirthDate,
+                member.Phone, member.Email, member.RegistrationDate, member.Status))
+            .ToListAsync(cancellationToken);
+        return members;
+    }
+
     public async Task<IReadOnlyList<MembershipPeriodDto>?> GetHistoryAsync(long memberId, CancellationToken cancellationToken)
     {
         bool exists = await dbContext.Members.AsNoTracking().AnyAsync(member => member.Id == memberId, cancellationToken);

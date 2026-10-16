@@ -205,10 +205,12 @@ Implemented backend modules:
 5. Monthly fee-obligation generation for active members (idempotent, respects inactive periods).
 6. Payment registration and allocation to complete obligations (cash, transfer, direct debit) with automatic income accounting.
 7. Member account statement with debt calculation (paid, pending, overdue; future obligations excluded from debt).
+8. Manual income and expense entries (create and cancel, no editing) and accounting summary with period filters (current month, previous month, year, custom range).
+9. Member portal (DNI-only session, own account statement access; members cannot reach administrative endpoints).
+10. Administrative dashboard (active/inactive members, pending/overdue obligations, total debt, current-month income/expense/balance).
+11. Payment listing with filters, payment cancellation endpoint, and CSV exports (members, payments, accounting entries).
 
 Pending work:
 
-- Other income and expenses (manual accounting entries).
-- Member portal (DNI-only access to own statement).
-- Dashboard / administrative summaries.
-- Filters, exports and user interfaces.
+- Frontend user interfaces.
+- Final end-to-end testing, corrections and deployment.

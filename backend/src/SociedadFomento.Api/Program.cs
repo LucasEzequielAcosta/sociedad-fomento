@@ -35,11 +35,32 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         context.HttpContext, StatusCodes.Status401Unauthorized, "Authentication required", "AUTHENTICATION_REQUIRED");
     options.Events.OnRedirectToAccessDenied = context => AuthenticationProblemWriter.WriteAsync(
         context.HttpContext, StatusCodes.Status403Forbidden, "Access forbidden", "FORBIDDEN");
+}).AddCookie(AuthenticationConstants.MemberScheme, options =>
+{
+    options.Cookie.Name = AuthenticationConstants.MemberCookieName;
+    options.Cookie.HttpOnly = true;
+    options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+    options.Cookie.SameSite = SameSiteMode.Strict;
+    options.ExpireTimeSpan = TimeSpan.FromHours(8);
+    options.SlidingExpiration = false;
+    options.Events.OnRedirectToLogin = context => AuthenticationProblemWriter.WriteAsync(
+        context.HttpContext, StatusCodes.Status401Unauthorized, "Authentication required", "AUTHENTICATION_REQUIRED");
+    options.Events.OnRedirectToAccessDenied = context => AuthenticationProblemWriter.WriteAsync(
+        context.HttpContext, StatusCodes.Status403Forbidden, "Access forbidden", "FORBIDDEN");
 });
 builder.Services.AddAuthorization();
 builder.Services.AddRateLimiter(options =>
 {
     options.AddPolicy(AuthenticationConstants.LoginRateLimitPolicy, context =>
+        RateLimitPartition.GetFixedWindowLimiter(context.Connection.RemoteIpAddress?.ToString() ?? "unknown", _ =>
+            new FixedWindowRateLimiterOptions
+            {
+                PermitLimit = 5,
+                Window = TimeSpan.FromMinutes(1),
+                QueueLimit = 0,
+                AutoReplenishment = true
+            }));
+    options.AddPolicy(AuthenticationConstants.MemberLoginRateLimitPolicy, context =>
         RateLimitPartition.GetFixedWindowLimiter(context.Connection.RemoteIpAddress?.ToString() ?? "unknown", _ =>
             new FixedWindowRateLimiterOptions
             {

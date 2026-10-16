@@ -1,4 +1,6 @@
 using SociedadFomento.Application.Payments;
+using SociedadFomento.Application.Payments.Dto;
+using SociedadFomento.Application.Payments.Models;
 using SociedadFomento.Domain.Entities;
 
 namespace SociedadFomento.Application.Tests;
@@ -26,6 +28,38 @@ internal sealed class FakePaymentContext : IPaymentContext
         Task.FromResult(Obligations.Any(obligation =>
             obligation.Id == feeObligationId &&
             obligation.PaymentAllocations.Any(allocation => !allocation.ReleasedAtUtc.HasValue)));
+
+    public Task<IReadOnlyList<PaymentListItemDto>> GetPaymentsAsync(PaymentFilter filter, CancellationToken cancellationToken)
+    {
+        IEnumerable<Payment> query = Payments;
+        if (filter.MemberId is not null)
+        {
+            query = query.Where(payment => payment.MemberId == filter.MemberId.Value);
+        }
+
+        if (filter.From is not null)
+        {
+            query = query.Where(payment => payment.PaymentDate >= filter.From.Value);
+        }
+
+        if (filter.To is not null)
+        {
+            query = query.Where(payment => payment.PaymentDate <= filter.To.Value);
+        }
+
+        if (filter.Method is not null)
+        {
+            query = query.Where(payment => payment.Method == filter.Method.Value);
+        }
+
+        return Task.FromResult<IReadOnlyList<PaymentListItemDto>>(query
+            .OrderByDescending(payment => payment.PaymentDate).ThenByDescending(payment => payment.Id)
+            .Select(payment => new PaymentListItemDto(
+                payment.Id, payment.MemberId, payment.Member.Dni, payment.Member.FirstName, payment.Member.LastName,
+                payment.PaymentDate, payment.Amount, payment.Method, payment.Status,
+                payment.PaymentAllocations.Select(allocation => allocation.FeeObligation.Period).ToList()))
+            .ToList());
+    }
 
     public void AddPayment(Payment payment) => Payments.Add(payment);
 

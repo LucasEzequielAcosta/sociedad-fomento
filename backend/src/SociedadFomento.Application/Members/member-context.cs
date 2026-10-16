@@ -14,6 +14,7 @@ public interface IMemberContext
     Task<MemberDetailDto?> GetByIdAsync(long memberId, CancellationToken cancellationToken);
     Task<MemberDetailDto?> GetByDniAsync(string normalizedDni, CancellationToken cancellationToken);
     Task<PagedResult<MemberSummaryDto>> SearchAsync(MemberSearchCriteria criteria, CancellationToken cancellationToken);
+    Task<IReadOnlyList<MemberDetailDto>> GetDetailsAsync(MemberSearchCriteria criteria, CancellationToken cancellationToken);
     Task<IReadOnlyList<MembershipPeriodDto>?> GetHistoryAsync(long memberId, CancellationToken cancellationToken);
     void AddMember(Member member);
     void AddObligation(FeeObligation obligation);

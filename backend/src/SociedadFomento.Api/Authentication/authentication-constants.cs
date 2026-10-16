@@ -5,6 +5,9 @@ public static class AuthenticationConstants
 {
     public const string CookieName = "SociedadFomento.Admin";
     public const string LoginRateLimitPolicy = "admin-login";
+    public const string MemberScheme = "MemberScheme";
+    public const string MemberCookieName = "SociedadFomento.Member";
+    public const string MemberLoginRateLimitPolicy = "member-login";
     public const string XsrfCookieName = "XSRF-TOKEN";
     public const string XsrfHeaderName = "X-XSRF-TOKEN";
 }

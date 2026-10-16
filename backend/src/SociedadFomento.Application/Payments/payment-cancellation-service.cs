@@ -1,4 +1,5 @@
 using SociedadFomento.Application.Abstractions;
+using SociedadFomento.Application.Common.Exceptions;
 using SociedadFomento.Domain.Entities;
 
 namespace SociedadFomento.Application.Payments;
@@ -26,7 +27,7 @@ public sealed class PaymentCancellationService
     private async Task CancelWithinTransactionAsync(long paymentId, CancellationToken cancellationToken)
     {
         Payment payment = await context.FindPaymentWithDetailsAsync(paymentId, cancellationToken)
-            ?? throw new KeyNotFoundException($"Payment {paymentId} was not found.");
+            ?? throw new ResourceNotFoundException("PAYMENT_NOT_FOUND", $"Payment {paymentId} was not found.");
         AccountingEntry entry = payment.AccountingEntry
             ?? throw new InvalidOperationException("The payment has no automatic accounting entry.");
         DateTime cancelledAtUtc = clock.UtcNow;

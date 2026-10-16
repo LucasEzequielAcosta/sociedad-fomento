@@ -53,6 +53,18 @@ public sealed class MemberService
         return context.SearchAsync(normalized, cancellationToken);
     }
 
+    /// <summary>Returns the full detail of every member matching the supplied filters, without pagination.</summary>
+    public Task<IReadOnlyList<MemberDetailDto>> GetAllDetailsAsync(MemberSearchCriteria criteria, CancellationToken cancellationToken = default)
+    {
+        MemberSearchCriteria normalized = criteria with
+        {
+            Dni = string.IsNullOrWhiteSpace(criteria.Dni) ? null : NormalizeDni(criteria.Dni),
+            Name = NormalizeFilter(criteria.Name),
+            LastName = NormalizeFilter(criteria.LastName)
+        };
+        return context.GetDetailsAsync(normalized, cancellationToken);
+    }
+
     /// <summary>Updates only editable personal member information.</summary>
     public async Task<MemberDetailDto> UpdatePersonalDataAsync(long memberId, MemberPersonalData data, CancellationToken cancellationToken = default)
     {
